@@ -94,34 +94,35 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
-import QrcodeVue from 'qrcode.vue'
-import { ref } from 'vue'
+import axios from 'axios'; // 👈 usamos axios directo SOLO aquí
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import QrcodeVue from 'qrcode.vue';
+import { ref } from 'vue';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// ✅ URL absoluta del backend (sin duplicar /api)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const nombre = ref('')
-const correo = ref('')
-const password = ref('')
-const telefono = ref('')
-const colegio = ref('')
-const carrera = ref('')
-const fechaNacimiento = ref('')
-const direccion = ref('')
+const nombre = ref('');
+const correo = ref('');
+const password = ref('');
+const telefono = ref('');
+const colegio = ref('');
+const carrera = ref('');
+const fechaNacimiento = ref('');
+const direccion = ref('');
 
-const msg = ref('')
-const error = ref('')
-const qrCodigo = ref(null)
+const msg = ref('');
+const error = ref('');
+const qrCodigo = ref(null);
 
 async function registrar() {
-  msg.value = ''
-  error.value = ''
-  qrCodigo.value = null
+  msg.value = '';
+  error.value = '';
+  qrCodigo.value = null;
 
   try {
-    const res = await axios.post(`${API_URL}/usuarios/registrar`, {
+    const res = await axios.post(`${API_URL}/api/usuarios/registrar`, {
       nombre: nombre.value,
       correo: correo.value,
       password: password.value,
@@ -130,33 +131,35 @@ async function registrar() {
       carrera: carrera.value || undefined,
       fechaNacimiento: fechaNacimiento.value || undefined,
       direccion: direccion.value || undefined,
-    })
-    qrCodigo.value = res.data.qrCodigo
-    msg.value = `✅ ${res.data.nombre} registrado correctamente.`
+    });
+
+    qrCodigo.value = res.data.qrCodigo;
+    msg.value = `✅ ${res.data.nombre} registrado correctamente.`;
   } catch (err) {
-    error.value = err.response?.data?.message || 'Error al registrarse'
+    console.error('Error en registro:', err);
+    error.value = err.response?.data?.message || 'Error al registrarse';
   }
 }
 
 async function descargarImagen() {
-  const qrElement = document.getElementById('qr-area')
-  const canvas = await html2canvas(qrElement)
-  const link = document.createElement('a')
-  link.download = 'mi-qr.png'
-  link.href = canvas.toDataURL('image/png')
-  link.click()
+  const qrElement = document.getElementById('qr-area');
+  const canvas = await html2canvas(qrElement);
+  const link = document.createElement('a');
+  link.download = 'mi-qr.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 
 async function descargarPDF() {
-  const qrElement = document.getElementById('qr-area')
-  const canvas = await html2canvas(qrElement)
-  const imgData = canvas.toDataURL('image/png')
-  const pdf = new jsPDF()
-  const width = pdf.internal.pageSize.getWidth()
-  const height = (canvas.height * width) / canvas.width
-  pdf.text('Código QR - Congreso de Tecnología 2025', 14, 20)
-  pdf.addImage(imgData, 'PNG', 15, 30, width - 30, height)
-  pdf.save('mi-qr.pdf')
+  const qrElement = document.getElementById('qr-area');
+  const canvas = await html2canvas(qrElement);
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jsPDF();
+  const width = pdf.internal.pageSize.getWidth();
+  const height = (canvas.height * width) / canvas.width;
+  pdf.text('Código QR - Congreso de Tecnología 2025', 14, 20);
+  pdf.addImage(imgData, 'PNG', 15, 30, width - 30, height);
+  pdf.save('mi-qr.pdf');
 }
 </script>
 
@@ -190,12 +193,7 @@ async function descargarPDF() {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* ✍️ Formularios */
-.form-label {
-  font-weight: 500;
-}
-
-/* 📱 Botones */
+/* Botones */
 .btn-primary {
   background-color: #1976d2;
   border: none;
@@ -221,25 +219,7 @@ async function descargarPDF() {
   height: auto;
 }
 
-/* 🧭 Espaciados y centrado */
-.text-center {
-  text-align: center;
-}
-.gap-3 {
-  gap: 1rem;
-}
-
-/* ✅ Ajustes globales */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: transparent;
-  overflow-x: hidden;
-}
-
-/* 🔁 Responsividad */
+/* Responsividad */
 @media (max-width: 768px) {
   .card {
     padding: 1.5rem;
@@ -262,6 +242,4 @@ body {
     font-size: 1.25rem;
   }
 }
-
-
 </style>
